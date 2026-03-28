@@ -2,189 +2,412 @@
 <html lang="en">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Toy Wheels — Login & Shop</title>
+  <link href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700;900&display=swap" rel="stylesheet">
   <style>
-    :root{
+    :root {
       --bg1: #7dd3fc;
       --bg2: #60a5fa;
       --card: rgba(255,255,255,0.92);
-      --accent: #ff7ab6;
       --muted: #5b6b7a;
-      --glass: rgba(255,255,255,0.12);
-      --glass-2: rgba(255,255,255,0.06);
+      --shadow: 0 18px 40px rgba(2,6,23,0.16);
+      --blue1: #1e40ff;
+      --blue2: #3b82f6;
+      --blueHover1: #1d4ed8;
+      --blueHover2: #60a5fa;
     }
 
-    html,body{height:100%;margin:0;font-family:Inter, system-ui, -apple-system, "Segoe UI", Roboto, Arial;color:#06203a}
-    body{
-      background: linear-gradient(120deg,var(--bg1),var(--bg2));
-      -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale;
-      overflow:hidden;
+    html, body {
+      height: 100%;
+      margin: 0;
+      font-family: 'Lato', sans-serif;
+      color: #06203a;
+      overflow: hidden;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      background: linear-gradient(120deg, var(--bg1), var(--bg2));
     }
 
-    /* layout */
-    .app{min-height:100vh;display:flex;align-items:center;justify-content:center;position:relative;z-index:2;padding:28px;box-sizing:border-box}
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      backdrop-filter: blur(8px) saturate(1.05);
+      pointer-events: none;
+      z-index: 0;
+    }
 
-    .card{width:100%;max-width:980px;background:var(--card);border-radius:14px;padding:22px;box-shadow:0 18px 40px rgba(2,6,23,0.16);position:relative;overflow:hidden}
+    .app {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      z-index: 2;
+      padding: 28px;
+      box-sizing: border-box;
+    }
 
-    .topbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
-    .brand{display:flex;gap:12px;align-items:center}
-    .brand-logo{width:56px;height:56px;border-radius:12px;background:linear-gradient(135deg,#ffb86b,#ff7ab6);display:flex;align-items:center;justify-content:center;color:white;font-weight:800}
+    .card {
+      width: 100%;
+      max-width: 1040px;
+      background: var(--card);
+      border-radius: 16px;
+      padding: 22px;
+      box-shadow: var(--shadow);
+      overflow: hidden;
+      position: relative;
+    }
 
-    /* cart icon */
-    .cart-btn{position:relative;background:transparent;border:none;cursor:pointer;padding:8px;border-radius:10px}
-    .cart-badge{position:absolute;right:2px;top:2px;background:#ef4444;color:#fff;border-radius:10px;padding:2px 6px;font-size:12px}
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 12px;
+    }
 
-    /* Views */
-    .view{display:none}
-    .view.active{display:block}
+    .brand {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+    }
 
-    /* login */
-    .login-grid{display:grid;grid-template-columns:420px 1fr;gap:18px;align-items:center}
-    @media (max-width:840px){.login-grid{grid-template-columns:1fr}}
+    .brand-logo {
+      width: 56px;
+      height: 56px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, #ffb86b, #ff7ab6);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      font-weight: 900;
+      letter-spacing: 1px;
+      box-shadow: 0 10px 22px rgba(255,122,182,0.24);
+    }
 
-    form{display:flex;flex-direction:column;gap:12px}
-    input[type=text],input[type=password]{padding:12px;border-radius:10px;border:1px solid rgba(10,20,30,0.06);font-size:15px}
-    .btn{background:linear-gradient(90deg,#ff7ab6,#ffb86b);border:none;padding:10px 14px;border-radius:10px;color:white;font-weight:700;cursor:pointer}
+    .muted { color: var(--muted); }
 
-    .notice{display:none;padding:10px;border-radius:10px}
-    .notice.error{background:rgba(255,49,66,0.08);color:#b20b2a}
-    .notice.info{background:rgba(34,197,94,0.08);color:#065f46}
+    .view { display: none; }
+    .view.active { display: block; }
 
-    /* shop */
-    .shop-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px}
-    .toy{background:linear-gradient(180deg,rgba(255,255,255,0.9),rgba(255,255,255,0.85));border-radius:12px;padding:12px;display:flex;flex-direction:column;gap:10px;align-items:center;box-shadow:0 6px 18px rgba(2,6,23,0.06)}
-    .toy .title{font-weight:800}
-    .toy .price{color:var(--muted)}
-    .toy .actions{display:flex;gap:8px}
+    .login-grid {
+      display: grid;
+      grid-template-columns: 420px 1fr;
+      gap: 18px;
+      align-items: start;
+    }
 
-    /* cart drawer / modal */
-    .drawer{position:fixed;right:18px;top:18px;width:360px;max-width:calc(100% - 36px);background:white;border-radius:12px;padding:12px;box-shadow:0 22px 60px rgba(2,6,23,0.3);z-index:40;display:none}
-    .drawer.open{display:block}
-    .cart-row{display:flex;justify-content:space-between;gap:8px;padding:8px 6px;border-bottom:1px dashed rgba(10,20,30,0.05)}
-    .totals{display:flex;justify-content:space-between;font-weight:800;padding-top:8px}
+    @media (max-width: 900px) {
+      .login-grid { grid-template-columns: 1fr; }
+    }
 
-    /* tiny helper */
-    .muted{color:var(--muted)}
-    .center{display:flex;align-items:center;justify-content:center}
+    input[type="text"], input[type="password"] {
+      width: 100%;
+      box-sizing: border-box;
+      padding: 12px 14px;
+      border-radius: 10px;
+      border: 1px solid rgba(10,20,30,0.08);
+      font-size: 15px;
+      outline: none;
+      background: rgba(255,255,255,0.9);
+      margin-top: 6px;
+    }
 
-    footer{position:fixed;left:12px;bottom:12px;font-size:13px;color:rgba(3,7,18,0.45);z-index:3;background:rgba(255,255,255,0.35);padding:8px 10px;border-radius:10px}
+    label {
+      font-size: 14px;
+      font-weight: 700;
+      display: inline-block;
+      margin-top: 8px;
+    }
+
+    .notice {
+      display: none;
+      padding: 10px 12px;
+      border-radius: 10px;
+      font-size: 14px;
+      margin-top: 12px;
+    }
+    .notice.error {
+      background: rgba(255,49,66,0.08);
+      color: #b20b2a;
+    }
+    .notice.info {
+      background: rgba(34,197,94,0.08);
+      color: #065f46;
+    }
+
+    .shop-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 14px;
+      margin-top: 10px;
+    }
+
+    .toy {
+      background: linear-gradient(180deg, rgba(255,255,255,0.94), rgba(255,255,255,0.85));
+      border-radius: 14px;
+      padding: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      align-items: center;
+      box-shadow: 0 8px 20px rgba(2,6,23,0.06);
+      border: 1px solid rgba(255,255,255,0.5);
+    }
+
+    .toy .title { font-size: 18px; font-weight: 900; }
+    .toy .price { color: var(--muted); font-size: 15px; }
+    .toy .actions { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; }
+
+    .cart-btn {
+      position: relative;
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      padding: 8px;
+      border-radius: 10px;
+    }
+
+    .cart-badge {
+      position: absolute;
+      right: 2px;
+      top: 2px;
+      background: #ef4444;
+      color: #fff;
+      border-radius: 999px;
+      padding: 2px 7px;
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .drawer {
+      position: fixed;
+      right: 18px;
+      top: 18px;
+      width: 360px;
+      max-width: calc(100% - 36px);
+      background: white;
+      border-radius: 14px;
+      padding: 14px;
+      box-shadow: 0 22px 60px rgba(2,6,23,0.3);
+      z-index: 40;
+      display: none;
+    }
+    .drawer.open { display: block; }
+
+    .cart-row {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 10px 6px;
+      border-bottom: 1px dashed rgba(10,20,30,0.08);
+      align-items: center;
+    }
+
+    .totals {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-weight: 900;
+      padding-top: 10px;
+      font-size: 16px;
+    }
+
+    .center { display: flex; align-items: center; justify-content: center; }
+
+    .checkout-modal {
+      position: fixed;
+      inset: 0;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      background: rgba(2,6,23,0.45);
+      z-index: 60;
+      padding: 16px;
+      box-sizing: border-box;
+    }
+
+    .checkout-panel {
+      background: white;
+      padding: 18px;
+      border-radius: 14px;
+      max-width: 420px;
+      width: 100%;
+      box-shadow: 0 20px 50px rgba(2,6,23,0.22);
+    }
+
+    footer {
+      position: fixed;
+      left: 12px;
+      bottom: 12px;
+      font-size: 13px;
+      color: rgba(3,7,18,0.45);
+      z-index: 3;
+      background: rgba(255,255,255,0.35);
+      padding: 8px 10px;
+      border-radius: 10px;
+    }
+
+    /* Single blue button design for everything */
+    .custom-btn {
+      width: 130px;
+      height: 40px;
+      color: #fff;
+      border-radius: 5px;
+      padding: 0 14px;
+      font-family: 'Lato', sans-serif;
+      font-weight: 700;
+      background: linear-gradient(0deg, var(--blue1) 0%, var(--blue2) 100%);
+      cursor: pointer;
+      transition: all 0.3s ease;
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: inset 2px 2px 2px 0px rgba(255,255,255,.35),
+                  7px 7px 20px 0px rgba(0,0,0,.1),
+                  4px 4px 5px 0px rgba(0,0,0,.1);
+      outline: none;
+      border: none;
+      text-decoration: none;
+    }
+
+    .custom-btn:hover {
+      background: linear-gradient(0deg, var(--blueHover1) 0%, var(--blueHover2) 100%);
+      color: #fff;
+    }
+
+    .custom-btn:active {
+      transform: translateY(1px);
+    }
+
+    .action-row {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      justify-content: center;
+      margin-top: 6px;
+    }
+
+    .shop-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 8px;
+      flex-wrap: wrap;
+    }
   </style>
 </head>
 <body>
   <div class="app">
-    <div class="card" role="main">
+    <div class="card">
       <div class="topbar">
-        <div class="brand"><div class="brand-logo">TW</div><div><div style="font-weight:800">Toy Wheels</div><div class="muted">Fun toys for little drivers</div></div></div>
-        <div>
-          <button id="cartToggle" class="cart-btn" aria-label="Open cart">
-            <!-- simple shopping bag icon -->
-            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M6 2h12l1 4v13a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6l1-4z" stroke="#06203a" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" fill="#fff"/></svg>
-            <span id="cartBadge" class="cart-badge" style="display:none">0</span>
-          </button>
+        <div class="brand">
+          <div class="brand-logo">TW</div>
+          <div>
+            <div style="font-size:18px;font-weight:900">Toy Wheels</div>
+            <div class="muted">Fun toys for little drivers</div>
+          </div>
         </div>
+
+        <button id="cartToggle" class="cart-btn custom-btn" aria-label="Open cart" title="Open cart">
+          Cart
+          <span id="cartBadge" class="cart-badge" style="display:none">0</span>
+        </button>
       </div>
 
-      <!-- LOGIN VIEW -->
-      <div id="loginView" class="view">
+      <div id="loginView" class="view active">
         <div class="login-grid">
           <div>
-            <h2 style="margin-top:0">Welcome — Log in to continue</h2>
-            <p class="muted">Enter your name (English letters only) and any password to proceed to the toy shop.</p>
+            <h2 style="margin-top:0">Welcome — log in to continue</h2>
+            <p class="muted">Enter your name using English letters only. Any password will work.</p>
 
-            <div id="nameError" class="notice error" role="alert" aria-live="polite" style="margin-top:12px;display:none"></div>
+            <div id="nameError" class="notice error" role="alert" aria-live="polite"></div>
 
-            <form id="loginForm" novalidate style="margin-top:12px">
+            <form id="loginForm" novalidate>
               <label for="nameInput">Your name</label>
               <input id="nameInput" type="text" placeholder="e.g. John Smith" autocomplete="name" required />
 
               <label for="passInput">Password</label>
               <input id="passInput" type="password" placeholder="any password works" autocomplete="current-password" required />
 
-              <div style="display:flex;gap:10px;margin-top:8px;align-items:center">
-                <button class="btn" id="loginBtn" type="submit">Log in</button>
-                <div class="muted">Demo mode — passwords accepted.</div>
+              <div class="action-row" style="justify-content:flex-start;margin-top:14px">
+                <button class="custom-btn" type="submit" id="loginBtn">Login</button>
               </div>
             </form>
-
           </div>
 
-          <div class="muted" style="padding:8px">
-            <h3>Featured toys preview</h3>
-            <p class="muted">You can browse featured toys after login. Here's a quick peek.</p>
-
-            <div style="margin-top:12px" class="shop-grid">
-              <!-- preview cards (same toys that will be in the shop) -->
+          <div>
+            <h3 style="margin-top:0">Featured toys preview</h3>
+            <p class="muted">These are the products you will see after login.</p>
+            <div class="shop-grid">
               <div class="toy"><div class="title">Toy car</div><div class="price">$3.99</div></div>
               <div class="toy"><div class="title">Robot</div><div class="price">$23.44</div></div>
               <div class="toy"><div class="title">Box (Lego)</div><div class="price">$560.30</div></div>
               <div class="toy"><div class="title">Play dough</div><div class="price">$4.55</div></div>
             </div>
-
           </div>
         </div>
       </div>
 
-      <!-- SHOP VIEW -->
       <div id="shopView" class="view">
-        <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:12px">
+        <div class="shop-head">
           <div>
-            <div id="welcomeHeader" style="font-weight:800">Hello —</div>
-            <div class="muted">Browse featured toys, add them to your cart and pay when ready.</div>
+            <div id="welcomeHeader" style="font-size:22px;font-weight:900">Hello!</div>
+            <div class="muted">Browse the featured toys and add them to your cart.</div>
           </div>
-          <div class="muted">Tip: use the cart icon top-right to view / pay.</div>
-        </div>
-
-        <div class="shop-grid" id="productsGrid">
-          <!-- products injected by JS -->
-        </div>
-      </div>
-
-      <!-- cart drawer -->
-      <div id="cartDrawer" class="drawer" aria-hidden="true">
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
-          <div style="font-weight:800">Your cart</div>
-          <div><button id="closeCart" class="muted" style="border:none;background:transparent;cursor:pointer">Close</button></div>
-        </div>
-        <div id="cartItems" style="max-height:320px;overflow:auto"></div>
-
-        <div class="totals">
-          <div class="muted">Total</div>
-          <div id="cartTotal">$0.00</div>
-        </div>
-
-        <div style="margin-top:10px;display:flex;gap:8px;justify-content:flex-end">
-          <button id="clearCartBtn" class="muted" style="background:transparent;border:none;cursor:pointer">Clear</button>
-          <button id="checkoutBtn" class="btn">Pay</button>
-        </div>
-      </div>
-
-      <!-- simple payment modal (in-page) -->
-      <div id="payModal" style="position:fixed;inset:0;display:none;align-items:center;justify-content:center;background:rgba(2,6,23,0.45);z-index:60">
-        <div style="background:white;padding:18px;border-radius:12px;max-width:420px;width:100%">
-          <div style="font-weight:800;margin-bottom:6px">Checkout</div>
-          <div class="muted" style="margin-bottom:12px">Total: <span id="payTotal">$0.00</span></div>
-
-          <label>Cardholder name</label>
-          <input id="cardName" type="text" placeholder="Name on card" style="width:100%;padding:10px;border-radius:8px;border:1px solid rgba(0,0,0,0.06);" />
-
-          <label style="margin-top:8px">Card number (demo)</label>
-          <input id="cardNumber" type="text" placeholder="1234 5678 9012 3456" style="width:100%;padding:10px;border-radius:8px;border:1px solid rgba(0,0,0,0.06);" />
-
-          <div style="display:flex;gap:8px;margin-top:12px;justify-content:flex-end">
-            <button id="cancelPay" class="muted" style="border:none;background:transparent;cursor:pointer">Cancel</button>
-            <button id="confirmPay" class="btn">Confirm payment</button>
+          <div class="action-row" style="margin-top:0">
+            <button id="logoutBtn" class="custom-btn">Logout</button>
+            <button id="clearCartHeaderBtn" class="custom-btn">Clear Cart</button>
           </div>
         </div>
-      </div>
 
+        <div class="shop-grid" id="productsGrid"></div>
+      </div>
     </div>
   </div>
 
-  <footer>Demo toy store — client-only demo (no real payments)</footer>
+  <div id="cartDrawer" class="drawer" aria-hidden="true">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;gap:10px">
+      <div style="font-weight:900">Your cart</div>
+      <button id="closeCart" class="custom-btn" style="width:90px;height:34px">Close</button>
+    </div>
+    <div id="cartItems" style="max-height:320px;overflow:auto"></div>
+    <div class="totals">
+      <div class="muted">Total</div>
+      <div id="cartTotal">$0.00</div>
+    </div>
+    <div class="action-row" style="justify-content:flex-end">
+      <button id="clearCartBtn" class="custom-btn">Clear</button>
+      <button id="checkoutBtn" class="custom-btn">Pay</button>
+    </div>
+  </div>
+
+  <div id="payModal" class="checkout-modal" aria-hidden="true">
+    <div class="checkout-panel">
+      <div style="font-size:20px;font-weight:900;margin-bottom:6px">Checkout</div>
+      <div class="muted" style="margin-bottom:12px">Total: <span id="payTotal">$0.00</span></div>
+
+      <label for="cardName">Cardholder name</label>
+      <input id="cardName" type="text" placeholder="Name on card" />
+
+      <label for="cardNumber" style="margin-top:8px">Card number (demo)</label>
+      <input id="cardNumber" type="text" placeholder="1234 5678 9012 3456" />
+
+      <div class="action-row" style="justify-content:flex-end;margin-top:14px">
+        <button id="cancelPay" class="custom-btn">Cancel</button>
+        <button id="confirmPay" class="custom-btn">Confirm</button>
+      </div>
+    </div>
+  </div>
+
+  <footer>Demo toy store — client-only checkout</footer>
 
   <script>
-    // App data: products
     const PRODUCTS = [
       { id: 'car', title: 'Toy car', price: 3.99 },
       { id: 'robot', title: 'Robot', price: 23.44 },
@@ -192,16 +415,11 @@
       { id: 'play-dough', title: 'Play dough', price: 4.55 }
     ];
 
-    // Utils
     const $ = sel => document.querySelector(sel);
-    const create = (tag, attrs = {}, children = []) => { const el = document.createElement(tag); for(const k in attrs) { if(k === 'class') el.className = attrs[k]; else if(k === 'text') el.textContent = attrs[k]; else el.setAttribute(k, attrs[k]); } children.forEach(c => el.appendChild(c)); return el }
-
-    // Elements
     const loginView = $('#loginView');
     const shopView = $('#shopView');
     const loginForm = $('#loginForm');
     const nameInput = $('#nameInput');
-    const passInput = $('#passInput');
     const nameError = $('#nameError');
     const welcomeHeader = $('#welcomeHeader');
     const productsGrid = $('#productsGrid');
@@ -212,146 +430,255 @@
     const cartTotal = $('#cartTotal');
     const closeCart = $('#closeCart');
     const clearCartBtn = $('#clearCartBtn');
+    const clearCartHeaderBtn = $('#clearCartHeaderBtn');
     const checkoutBtn = $('#checkoutBtn');
     const payModal = $('#payModal');
     const payTotal = $('#payTotal');
     const cancelPay = $('#cancelPay');
     const confirmPay = $('#confirmPay');
-    const cardName = $('#cardName');
-    const cardNumber = $('#cardNumber');
+    const logoutBtn = $('#logoutBtn');
 
-    // Cart persisted in localStorage
     const CART_KEY = 'toyshop_cart_v1';
-    function loadCart(){ try{ return JSON.parse(localStorage.getItem(CART_KEY)) || [] }catch(e){ return [] } }
-    function saveCart(cart){ localStorage.setItem(CART_KEY, JSON.stringify(cart)); updateCartUI(); }
+    const NAME_KEY = 'toyshop_name_v1';
 
-    function addToCart(product){ const cart = loadCart(); cart.push({ id: product.id, title: product.title, price: product.price }); saveCart(cart); }
-    function removeFromCart(index){ const cart = loadCart(); if(index>=0 && index<cart.length){ cart.splice(index,1); saveCart(cart); } }
-    function clearCart(){ localStorage.removeItem(CART_KEY); updateCartUI(); }
+    function loadCart() {
+      try { return JSON.parse(localStorage.getItem(CART_KEY)) || []; }
+      catch { return []; }
+    }
 
-    function updateCartUI(){ const cart = loadCart(); // badge
-      if(cart.length>0){ cartBadge.style.display='inline-block'; cartBadge.textContent = String(cart.length); } else { cartBadge.style.display='none'; }
+    function saveCart(cart) {
+      localStorage.setItem(CART_KEY, JSON.stringify(cart));
+      updateCartUI();
+    }
 
-      // populate drawer
-      cartItems.innerHTML='';
+    function addToCart(product) {
+      const cart = loadCart();
+      cart.push({ id: product.id, title: product.title, price: product.price });
+      saveCart(cart);
+      flashInfo(`${product.title} added to cart`);
+    }
+
+    function removeFromCart(index) {
+      const cart = loadCart();
+      if (index >= 0 && index < cart.length) {
+        cart.splice(index, 1);
+        saveCart(cart);
+      }
+    }
+
+    function clearCart() {
+      localStorage.removeItem(CART_KEY);
+      updateCartUI();
+    }
+
+    function showLogin() {
+      loginView.classList.add('active');
+      shopView.classList.remove('active');
+      location.hash = '#';
+    }
+
+    function showShop() {
+      loginView.classList.remove('active');
+      shopView.classList.add('active');
+      location.hash = '#shop';
+    }
+
+    function escapeHtml(s) {
+      return String(s)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;');
+    }
+
+    function updateCartUI() {
+      const cart = loadCart();
       let total = 0;
-      cart.forEach((it, idx)=>{
-        total += Number(it.price);
-        const row = create('div',{class:'cart-row'},[]);
-        const left = create('div',{},[]);
-        left.innerHTML = `<div style="font-weight:700">${escapeHtml(it.title)}</div><div class="muted">$${Number(it.price).toFixed(2)}</div>`;
-        const right = create('div',{},[]);
-        const rem = create('button', { class: 'muted', type: 'button' }, []);
-        rem.textContent = 'Remove';
-        rem.style.border='none'; rem.style.background='transparent'; rem.style.cursor='pointer';
-        rem.addEventListener('click', ()=>{ removeFromCart(idx); });
-        right.appendChild(rem);
-        row.appendChild(left);
-        row.appendChild(right);
+
+      if (cart.length > 0) {
+        cartBadge.style.display = 'inline-block';
+        cartBadge.textContent = String(cart.length);
+      } else {
+        cartBadge.style.display = 'none';
+      }
+
+      cartItems.innerHTML = '';
+      cart.forEach((item, idx) => {
+        total += Number(item.price);
+        const row = document.createElement('div');
+        row.className = 'cart-row';
+        row.innerHTML = `
+          <div>
+            <div style="font-weight:800">${escapeHtml(item.title)}</div>
+            <div class="muted">$${Number(item.price).toFixed(2)}</div>
+          </div>
+        `;
+        const removeBtn = document.createElement('button');
+        removeBtn.className = 'custom-btn';
+        removeBtn.style.width = '90px';
+        removeBtn.style.height = '34px';
+        removeBtn.textContent = 'Remove';
+        removeBtn.addEventListener('click', () => removeFromCart(idx));
+        row.appendChild(removeBtn);
         cartItems.appendChild(row);
       });
 
+      if (cart.length === 0) {
+        cartItems.innerHTML = '<div class="muted center" style="padding:24px">Your cart is empty</div>';
+      }
+
       cartTotal.textContent = `$${total.toFixed(2)}`;
       payTotal.textContent = `$${total.toFixed(2)}`;
-
-      // if cart empty show placeholder
-      if(cart.length===0){ cartItems.innerHTML = '<div class="muted center" style="padding:24px">Your cart is empty</div>' }
     }
 
-    // render products
-    function renderProducts(){ productsGrid.innerHTML = ''; PRODUCTS.forEach(p=>{
-      const card = create('div',{class:'toy'},[]);
-      const title = create('div',{class:'title', text:p.title});
-      const price = create('div',{class:'price', text:`$${p.price.toFixed(2)}`});
-      const actions = create('div',{class:'actions'},[]);
-      const buyBtn = create('button',{class:'btn',type:'button'},[]);
-      buyBtn.textContent = 'Buy';
-      buyBtn.addEventListener('click', ()=>{ addToCart(p); flashInfo(`${p.title} added to cart`); });
-      actions.appendChild(buyBtn);
-      card.appendChild(title); card.appendChild(price); card.appendChild(actions);
-      productsGrid.appendChild(card);
-    }) }
+    function renderProducts() {
+      productsGrid.innerHTML = '';
+      PRODUCTS.forEach((product) => {
+        const card = document.createElement('div');
+        card.className = 'toy';
+        card.innerHTML = `
+          <div class="title">${escapeHtml(product.title)}</div>
+          <div class="price">$${product.price.toFixed(2)}</div>
+        `;
 
-    // simple escaped text helper
-    function escapeHtml(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;') }
+        const actions = document.createElement('div');
+        actions.className = 'actions';
 
-    // show views
-    function showView(name){ if(name==='shop'){ loginView.classList.remove('active'); shopView.classList.add('active'); location.hash = '#shop'; } else { shopView.classList.remove('active'); loginView.classList.add('active'); location.hash = '#'; } }
+        const buyBtn = document.createElement('button');
+        buyBtn.className = 'custom-btn';
+        buyBtn.textContent = 'Buy';
+        buyBtn.addEventListener('click', () => addToCart(product));
 
-    // flash notice
+        actions.appendChild(buyBtn);
+        card.appendChild(actions);
+        productsGrid.appendChild(card);
+      });
+    }
+
     let noticeTimer = null;
-    function flashInfo(msg, time=1800){ nameError.className='notice info'; nameError.style.display='block'; nameError.textContent = msg; clearTimeout(noticeTimer); noticeTimer = setTimeout(()=>{ nameError.style.display='none' }, time); }
-    function flashError(msg, time=3000){ nameError.className='notice error'; nameError.style.display='block'; nameError.textContent = msg; clearTimeout(noticeTimer); noticeTimer = setTimeout(()=>{ nameError.style.display='none' }, time); }
+    function flashInfo(msg, time = 1800) {
+      nameError.className = 'notice info';
+      nameError.style.display = 'block';
+      nameError.textContent = msg;
+      clearTimeout(noticeTimer);
+      noticeTimer = setTimeout(() => { nameError.style.display = 'none'; }, time);
+    }
+    function flashError(msg, time = 3000) {
+      nameError.className = 'notice error';
+      nameError.style.display = 'block';
+      nameError.textContent = msg;
+      clearTimeout(noticeTimer);
+      noticeTimer = setTimeout(() => { nameError.style.display = 'none'; }, time);
+    }
 
-    // LOGIN logic
     const englishNameRegex = /^[A-Za-z\s]+$/;
-    loginForm.addEventListener('submit', function(e){ e.preventDefault(); const rawName = nameInput.value.trim(); if(!rawName){ flashError('Please enter your name.'); nameInput.focus(); return; }
-      if(!englishNameRegex.test(rawName)){
-        // show notification but do not block password acceptance
-        flashError('Name may only contain English letters (A–Z) and spaces. Please correct your name.'); nameInput.focus(); return;
+    loginForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const rawName = nameInput.value.trim();
+
+      if (!rawName) {
+        flashError('Please enter your name.');
+        nameInput.focus();
+        return;
       }
-      // Accept password always. "Transfer" user to shop view
+
+      if (!englishNameRegex.test(rawName)) {
+        flashError('Name may only contain English letters (A–Z) and spaces.');
+        nameInput.focus();
+        return;
+      }
+
+      localStorage.setItem(NAME_KEY, rawName);
       welcomeHeader.textContent = `Hello, ${rawName}!`;
-      // simulate transfer to another page by showing shop view
-      showView('shop');
-      renderProducts(); updateCartUI();
+      renderProducts();
+      updateCartUI();
+      showShop();
+      flashInfo('Login successful — welcome!');
     });
 
-    // live validation
-    nameInput.addEventListener('input', function(){ const v = nameInput.value; if(!v){ nameError.style.display='none'; return; } if(!englishNameRegex.test(v.trim())){ nameError.textContent = 'Only English letters and spaces are allowed in the name.'; nameError.className='notice error'; nameError.style.display='block'; } else { nameError.style.display='none' } });
+    nameInput.addEventListener('input', () => {
+      const v = nameInput.value;
+      if (!v) { nameError.style.display = 'none'; return; }
+      if (!englishNameRegex.test(v.trim())) {
+        nameError.className = 'notice error';
+        nameError.style.display = 'block';
+        nameError.textContent = 'Only English letters and spaces are allowed in the name.';
+      } else {
+        nameError.style.display = 'none';
+      }
+    });
 
-    // cart toggle
-    cartToggle.addEventListener('click', ()=>{ const open = cartDrawer.classList.toggle('open'); cartDrawer.setAttribute('aria-hidden', String(!open)); if(open) updateCartUI(); });
-    closeCart.addEventListener('click', ()=>{ cartDrawer.classList.remove('open'); cartDrawer.setAttribute('aria-hidden','true'); });
+    cartToggle.addEventListener('click', () => {
+      const open = cartDrawer.classList.toggle('open');
+      cartDrawer.setAttribute('aria-hidden', String(!open));
+      if (open) updateCartUI();
+    });
 
-    clearCartBtn.addEventListener('click', ()=>{ if(confirm('Clear cart?')){ clearCart(); } });
+    closeCart.addEventListener('click', () => {
+      cartDrawer.classList.remove('open');
+      cartDrawer.setAttribute('aria-hidden', 'true');
+    });
 
-    checkoutBtn.addEventListener('click', ()=>{
-      const cart = loadCart(); if(cart.length===0){ alert('Your cart is empty'); return; }
-      // show pay modal
-      payModal.style.display='flex';
-      payModal.setAttribute('aria-hidden','false');
+    clearCartBtn.addEventListener('click', () => {
+      if (confirm('Clear cart?')) clearCart();
+    });
+    clearCartHeaderBtn.addEventListener('click', () => {
+      if (confirm('Clear cart?')) clearCart();
+    });
+
+    checkoutBtn.addEventListener('click', () => {
+      const cart = loadCart();
+      if (cart.length === 0) {
+        flashError('Your cart is empty.');
+        return;
+      }
+      payModal.style.display = 'flex';
+      payModal.setAttribute('aria-hidden', 'false');
       payTotal.textContent = cartTotal.textContent;
     });
 
-    cancelPay.addEventListener('click', ()=>{ payModal.style.display='none'; payModal.setAttribute('aria-hidden','true'); });
+    cancelPay.addEventListener('click', () => {
+      payModal.style.display = 'none';
+      payModal.setAttribute('aria-hidden', 'true');
+    });
 
-    confirmPay.addEventListener('click', ()=>{
-      // simple demo: accept any card info and "process" payment
-      const cart = loadCart(); if(cart.length===0){ alert('Cart empty'); payModal.style.display='none'; return; }
-      // fake processing delay
-      confirmPay.disabled = true; confirmPay.textContent = 'Processing...';
-      setTimeout(()=>{
-        confirmPay.disabled = false; confirmPay.textContent = 'Confirm payment';
-        payModal.style.display='none';
+    confirmPay.addEventListener('click', () => {
+      const cart = loadCart();
+      if (cart.length === 0) {
+        flashError('Cart empty.');
+        payModal.style.display = 'none';
+        return;
+      }
+      confirmPay.disabled = true;
+      confirmPay.textContent = 'Processing...';
+      setTimeout(() => {
+        confirmPay.disabled = false;
+        confirmPay.textContent = 'Confirm';
+        payModal.style.display = 'none';
         alert('Payment successful! Thank you for your purchase.');
         clearCart();
       }, 900);
     });
 
-    // small helper to show a transient info near top
-    function flashTopMsg(msg){ flashInfo(msg, 1400); }
-
-    // On load: decide view by hash (if user previously logged in, remain on shop?)
-    window.addEventListener('load', ()=>{
-      const hash = location.hash || '#';
-      if(hash === '#shop'){
-        showView('shop'); renderProducts(); updateCartUI();
-        // if previously saved name in session, show it
-        const prevName = sessionStorage.getItem('toyshop_name'); if(prevName){ welcomeHeader.textContent = `Hello, ${prevName}!` }
-      } else { showView('login'); }
+    logoutBtn.addEventListener('click', () => {
+      welcomeHeader.textContent = 'Hello!';
+      showLogin();
+      flashInfo('Logged out');
     });
 
-    // store name to session when navigating to shop
-    const originalShowView = showView;
-    showView = function(name){ if(name==='shop'){ sessionStorage.setItem('toyshop_name', nameInput.value.trim() || sessionStorage.getItem('toyshop_name') || 'Friend'); } originalShowView(name); }
+    window.addEventListener('load', () => {
+      const savedName = localStorage.getItem(NAME_KEY);
+      if (location.hash === '#shop' && savedName) {
+        welcomeHeader.textContent = `Hello, ${savedName}!`;
+        renderProducts();
+        updateCartUI();
+        showShop();
+      } else {
+        showLogin();
+      }
+    });
 
-    // initialize
-    renderProducts(); updateCartUI();
-
-    // expose addToCart flash
-    function flashInfo(msg){ flashTopMsg(msg); }
-
+    renderProducts();
+    updateCartUI();
   </script>
 </body>
 </html>
